@@ -1,6 +1,5 @@
 import * as React from "react";
 import ProbabilityDistribution from "../../components/Graphics/ProbabilityDistribution";
-import GradientGraphic from "../../components/Graphics/GradientGraphic";
 import data from "./data.json";
 
 const App: React.FC = () => {
