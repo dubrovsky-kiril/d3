@@ -1,0 +1,118 @@
+import * as React from "react";
+import * as d3 from "d3";
+import styles from "./ProbabilityDistribution.scss";
+
+interface IProbabilityDistribution {
+  coordinates: Array<{
+    x: number;
+    y: number;
+  }>;
+  dimensions: {
+    height: number;
+    width: number;
+    margin: {
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
+    };
+  };
+}
+
+const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
+  dimensions,
+  coordinates
+}) => {
+  const graphicId: string = "probability-distribution-grpahic";
+
+  const drawGraphic = (): void => {
+    const area = d3
+      .select(`#${graphicId}`)
+      .append("svg")
+      .attr(
+        "height",
+        dimensions.height + dimensions.margin.top + dimensions.margin.bottom
+      )
+      .attr(
+        "width",
+        dimensions.width + dimensions.margin.left + dimensions.margin.right
+      )
+      .append("g")
+      .attr(
+        "transform",
+        `translate(${dimensions.margin.left}, ${dimensions.margin.top})`
+      );
+
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, 1])
+      .range([0, dimensions.width]);
+
+    // Flat all y values
+    const yValues = coordinates.reduce((acc, curr: any) => {
+      const yCoordinates = curr.map(coordinate => coordinate.y);
+      acc.push(...yCoordinates);
+
+      return acc;
+    }, []);
+
+    const yScale = d3
+      .scaleLinear()
+      .domain([0, Number(d3.max(yValues))])
+      .range([dimensions.height, 0]);
+
+    // Format xAxis
+    const xAxis = area
+      .append("g")
+      .attr("class", styles.xAxis)
+      .attr("transform", `translate(0, ${dimensions.height})`)
+      .call(d3.axisBottom(xScale).tickSize(-dimensions.height));
+
+    // Add vertical grid
+    xAxis
+      .attr("stroke-dasharray", "6")
+      .select(".domain")
+      .remove();
+
+    // Make identation between grid and text
+    d3.selectAll(".tick")
+      .select("text")
+      .attr("transform", `translate(0, 6)`);
+
+    // Format yAxis
+    const yAxis = area
+      .append("g")
+      .attr("class", styles.yAxis)
+      .call(d3.axisLeft(yScale).tickSize(0));
+
+    // Remove y axis
+    yAxis.select(".domain").remove();
+
+    // Line generator
+    const line = d3
+      .line()
+      .x((d: any) => xScale(d.x))
+      .y((d: any) => yScale(d.y))
+      .curve(d3.curveMonotoneX);
+
+    // Draw lines
+    area
+      .selectAll(".line")
+      .data(coordinates)
+      .enter()
+      .append("path")
+      .attr("class", "line")
+      .attr("d", (d: any) => line(d))
+      .style("stroke", (_, i) => ["blue", "red"][i])
+      .style("stroke-width", 2)
+      .style("fill", "none");
+  };
+
+  React.useEffect(() => {
+    drawGraphic();
+  }, []);
+
+  return <div id={graphicId} />;
+};
+
+export default ProbabilityDistribution;
