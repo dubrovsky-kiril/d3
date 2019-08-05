@@ -7,6 +7,8 @@
     "target": "es6",
     "jsx": "react",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "components/*": ["src/components/*"]
     }

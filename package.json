@@ -17,9 +17,13 @@
     }
   },
   "lint-staged": {
-    "*.{js,ts,tsx,md}": ["prettier --write", "git add"]
+    "*.{js,ts,tsx,md}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "dependencies": {
+    "d3": "^5.9.7",
     "normalize.css": "^8.0.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -30,6 +34,7 @@
     "@storybook/addon-info": "^5.0.11",
     "@storybook/addons": "^5.0.11",
     "@storybook/react": "^5.0.11",
+    "@types/d3": "^5.7.2",
     "@types/enzyme": "^3.9.1",
     "@types/enzyme-adapter-react-16": "^1.0.5",
     "@types/jest": "^24.0.12",
