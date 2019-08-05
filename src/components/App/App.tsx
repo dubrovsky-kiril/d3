@@ -6,8 +6,13 @@ import Footer from "components/Footer/Footer";
 import data from "./data.json";
 import styles from "./App.scss";
 
+type coordinate = {
+  x: number;
+  y: number;
+};
+
 interface IProbabilityDistribution {
-  lines: any;
+  coordinates: coordinate[];
   dimensions: {
     height: number;
     width: number;
@@ -22,9 +27,8 @@ interface IProbabilityDistribution {
 
 const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
   dimensions,
-  lines
+  coordinates
 }) => {
-  console.log(lines);
   const graphicId: string = "probability-distribution-grpahic";
 
   const drawGraphic = (): void => {
@@ -50,6 +54,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .domain([0, 1])
       .range([0, dimensions.width]);
 
+    // Flat all y values
     const yValues = data.reduce((acc, curr) => {
       const descutredYValues = curr.metrics.map(s => s.y);
       acc.push(...descutredYValues);
@@ -92,23 +97,18 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
     // Line generator
     const line = d3
       .line()
-      .x((d: any, i) => {
-        return xScale(d.x);
-      })
-      .y((d: any) => {
-        return yScale(d.y);
-      })
+      .x((d: any) => xScale(d.x))
+      .y((d: any) => yScale(d.y))
       .curve(d3.curveMonotoneX);
 
+    // Draw lines
     area
       .selectAll(".line")
-      .data(lines)
+      .data(coordinates)
       .enter()
       .append("path")
       .attr("class", "line")
-      .attr("d", (d: any) => {
-        return line(d.metrics);
-      })
+      .attr("d", (d: any) => line(d))
       .style("stroke", (_, i) => ["blue", "red"][i])
       .style("stroke-width", 2)
       .style("fill", "none");
@@ -141,7 +141,10 @@ const App: React.FC = () => {
 
   return (
     <div style={{ margin: "20px" }}>
-      <ProbabilityDistribution dimensions={dimensions} lines={data} />
+      <ProbabilityDistribution
+        dimensions={dimensions}
+        coordinates={formatedData}
+      />
     </div>
   );
 };
