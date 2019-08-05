@@ -24,6 +24,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
   dimensions,
   lines
 }) => {
+  console.log(lines);
   const graphicId: string = "probability-distribution-grpahic";
 
   const drawGraphic = (): void => {
@@ -87,6 +88,30 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
 
     // Remove y axis
     yAxis.select(".domain").remove();
+
+    // Line generator
+    const line = d3
+      .line()
+      .x((d: any, i) => {
+        return xScale(d.x);
+      })
+      .y((d: any) => {
+        return yScale(d.y);
+      })
+      .curve(d3.curveMonotoneX);
+
+    area
+      .selectAll(".line")
+      .data(lines)
+      .enter()
+      .append("path")
+      .attr("class", "line")
+      .attr("d", (d: any) => {
+        return line(d.metrics);
+      })
+      .style("stroke", (_, i) => ["blue", "red"][i])
+      .style("stroke-width", 2)
+      .style("fill", "none");
   };
 
   React.useEffect(() => {
@@ -99,16 +124,26 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
 const App: React.FC = () => {
   const dimensions = {
     height: 300,
-    width: 600,
+    width: 800,
     margin: {
-      top: 0,
+      top: 15,
       right: 15,
       bottom: 30,
       left: 15
     }
   };
 
-  return <ProbabilityDistribution dimensions={dimensions} lines={data} />;
+  const formatedData = data.reduce((acc, curr) => {
+    acc.push(curr.metrics);
+
+    return acc;
+  }, []);
+
+  return (
+    <div style={{ margin: "20px" }}>
+      <ProbabilityDistribution dimensions={dimensions} lines={data} />
+    </div>
+  );
 };
 
 export default App;
