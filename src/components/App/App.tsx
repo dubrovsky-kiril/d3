@@ -1,8 +1,5 @@
 import * as React from "react";
 import * as d3 from "d3";
-import Header from "components/Header/Header.container";
-import Main from "components/Main/Main.container";
-import Footer from "components/Footer/Footer";
 import data from "./data.json";
 import styles from "./App.scss";
 
