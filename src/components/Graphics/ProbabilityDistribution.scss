@@ -6,3 +6,8 @@
 .yAxis {
   font-size: 0;
 }
+
+.area {
+  fill: url(#area-gradient) !important;
+  opacity: 0.5;
+}

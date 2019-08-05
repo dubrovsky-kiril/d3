@@ -101,11 +101,29 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .data(coordinates)
       .enter()
       .append("path")
-      .attr("class", "line")
       .attr("d", (d: any) => line(d))
       .style("stroke", (_, i) => ["blue", "red"][i])
-      .style("stroke-width", 2)
-      .style("fill", "none");
+      .style("stroke-width", 3)
+      .attr("class", styles.area);
+
+    area
+      .append("linearGradient")
+      .attr("id", "area-gradient")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "0%")
+      .attr("y2", "100%")
+      .selectAll("stop")
+      .data([{ offset: "0", color: "blue" }, { offset: "85%", color: "white" }])
+      .enter()
+      .append("stop")
+      .attr("offset", d => {
+        return d.offset;
+      })
+      .attr("stop-color", d => {
+        return d.color;
+      });
   };
 
   React.useEffect(() => {
