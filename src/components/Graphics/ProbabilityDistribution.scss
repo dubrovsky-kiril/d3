@@ -7,7 +7,12 @@
   font-size: 0;
 }
 
-.area {
-  fill: url(#area-gradient) !important;
+.areaBlue {
+  fill: url(#blue-gradient) !important;
+  opacity: 0.5;
+}
+
+.areaRed {
+  fill: url(#red-gradient) !important;
   opacity: 0.5;
 }

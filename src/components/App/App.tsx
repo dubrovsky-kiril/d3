@@ -1,5 +1,5 @@
 import * as React from "react";
-import ProbabilityDistribution from "../../components/Graphics/ProbabilityDistribution";
+import ProbabilityDistribution from "../Graphics/ProbabilityDistribution";
 import data from "./data.json";
 
 const App: React.FC = () => {

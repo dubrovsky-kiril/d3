@@ -104,11 +104,13 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("d", (d: any) => line(d))
       .style("stroke", (_, i) => ["blue", "red"][i])
       .style("stroke-width", 3)
-      .attr("class", styles.area);
+      .attr("class", (d: any, i) =>
+        i === 0 ? styles.areaBlue : styles.areaRed
+      );
 
     area
       .append("linearGradient")
-      .attr("id", "area-gradient")
+      .attr("id", "blue-gradient")
       .attr("gradientUnits", "userSpaceOnUse")
       .attr("x1", "0%")
       .attr("y1", "0%")
@@ -118,12 +120,23 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .data([{ offset: "0", color: "blue" }, { offset: "85%", color: "white" }])
       .enter()
       .append("stop")
-      .attr("offset", d => {
-        return d.offset;
-      })
-      .attr("stop-color", d => {
-        return d.color;
-      });
+      .attr("offset", d => d.offset)
+      .attr("stop-color", d => d.color);
+
+    area
+      .append("linearGradient")
+      .attr("id", "red-gradient")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "0%")
+      .attr("y2", "100%")
+      .selectAll("stop")
+      .data([{ offset: "0", color: "red" }, { offset: "85%", color: "white" }])
+      .enter()
+      .append("stop")
+      .attr("offset", d => d.offset)
+      .attr("stop-color", d => d.color);
   };
 
   React.useEffect(() => {
