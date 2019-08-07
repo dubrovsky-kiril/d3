@@ -123,7 +123,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .selectAll("stop");
 
     d3.select("#blue-gradient")
-      .selectAll(".color")
+      .selectAll("stop")
       .data([{ offset: "0", color: "blue" }, { offset: "85%", color: "white" }])
       .enter()
       .append("stop")
@@ -131,7 +131,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("stop-color", d => d.color);
 
     d3.select("#red-gradient")
-      .selectAll(".color")
+      .selectAll("stop")
       .data([{ offset: "0", color: "red" }, { offset: "85%", color: "white" }])
       .enter()
       .append("stop")
