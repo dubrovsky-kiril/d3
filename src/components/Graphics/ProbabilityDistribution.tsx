@@ -106,32 +106,32 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .style("stroke-width", 3)
       .attr("class", (d: any, i) =>
         i === 0 ? styles.areaBlue : styles.areaRed
-      );
+      )
+      .append("linearGradient");
 
     area
+      .selectAll(".gradient")
+      .data(coordinates)
+      .enter()
       .append("linearGradient")
-      .attr("id", "blue-gradient")
+      .attr("id", (d, i) => (i === 0 ? "blue-gradient" : "red-gradient"))
       .attr("gradientUnits", "userSpaceOnUse")
       .attr("x1", "0%")
       .attr("y1", "0%")
       .attr("x2", "0%")
       .attr("y2", "100%")
-      .selectAll("stop")
+      .selectAll("stop");
+
+    d3.select("#blue-gradient")
+      .selectAll(".color")
       .data([{ offset: "0", color: "blue" }, { offset: "85%", color: "white" }])
       .enter()
       .append("stop")
       .attr("offset", d => d.offset)
       .attr("stop-color", d => d.color);
 
-    area
-      .append("linearGradient")
-      .attr("id", "red-gradient")
-      .attr("gradientUnits", "userSpaceOnUse")
-      .attr("x1", "0%")
-      .attr("y1", "0%")
-      .attr("x2", "0%")
-      .attr("y2", "100%")
-      .selectAll("stop")
+    d3.select("#red-gradient")
+      .selectAll(".color")
       .data([{ offset: "0", color: "red" }, { offset: "85%", color: "white" }])
       .enter()
       .append("stop")
