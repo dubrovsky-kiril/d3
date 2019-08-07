@@ -24,6 +24,8 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
   dimensions,
   coordinates
 }) => {
+  const [goodClientsTreshold, changGoodClientsTreshold] = React.useState(0.15);
+
   const graphicId: string = "probability-distribution-grpahic";
 
   const drawGraphic = (): void => {
@@ -143,18 +145,41 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("stop-color", d => d.color);
 
     area
-      .append("g")
       .append("rect")
+      .attr("id", "blue-treshold")
       .attr("x", 0)
-      .attr("width", dimensions.width * 0.15)
+      .attr("width", dimensions.width * goodClientsTreshold)
       .attr("height", dimensions.height)
       .attr("fill", "blue")
       .attr("opacity", "0.1");
+
+    area
+      .append("line")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "0%")
+      .attr("y2", 30)
+      .attr("stroke", "blue")
+      .attr("stroke-width", 4)
+      .attr("stroke-linecap", "round")
+      .attr(
+        "transform",
+        `translate(${dimensions.width *
+          goodClientsTreshold}, ${(dimensions.height - 30) / 2})`
+      )
+      .on("mousemove", () => {
+        d3.select("#blue-treshold").attr(
+          "width",
+          dimensions.width * (goodClientsTreshold + 0.15)
+        );
+      });
   };
 
   React.useEffect(() => {
     drawGraphic();
   }, []);
+
+  console.log(goodClientsTreshold);
 
   return <div id={graphicId} />;
 };
