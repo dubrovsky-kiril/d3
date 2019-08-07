@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as d3 from "d3";
 import styles from "./ProbabilityDistribution.scss";
+import { on } from "cluster";
 
 interface IProbabilityDistribution {
   coordinates: Array<{
@@ -109,6 +110,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       )
       .append("linearGradient");
 
+    // Prepare gradient tags
     area
       .selectAll(".gradient")
       .data(coordinates)
@@ -122,6 +124,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("y2", "100%")
       .selectAll("stop");
 
+    // Format first gradient
     d3.select("#blue-gradient")
       .selectAll("stop")
       .data([{ offset: "0", color: "blue" }, { offset: "85%", color: "white" }])
@@ -130,6 +133,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("offset", d => d.offset)
       .attr("stop-color", d => d.color);
 
+    // Format second gradient
     d3.select("#red-gradient")
       .selectAll("stop")
       .data([{ offset: "0", color: "red" }, { offset: "85%", color: "white" }])
@@ -137,6 +141,15 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .append("stop")
       .attr("offset", d => d.offset)
       .attr("stop-color", d => d.color);
+
+    area
+      .append("g")
+      .append("rect")
+      .attr("x", 0)
+      .attr("width", dimensions.width * 0.15)
+      .attr("height", dimensions.height)
+      .attr("fill", "blue")
+      .attr("opacity", "0.1");
   };
 
   React.useEffect(() => {
