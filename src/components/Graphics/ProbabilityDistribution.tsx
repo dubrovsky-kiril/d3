@@ -200,8 +200,6 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .style("opacity", 0.5);
 
     function redraw() {
-      console.log(blueTreshold);
-
       // Remove possability to drag rectan`gle to negative X coordinates
       d3.select("#dragging-rectangle")
         .attr("x", xScale(blueTreshold))
@@ -248,7 +246,7 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       } else if (xScale.invert(d3.event.x) < redTreshold) {
         blueTreshold = xScale.invert(d3.event.x);
       } else if (xScale.invert(d3.event.x) > redTreshold) {
-        blueTreshold = maxGoodClientsTrashold;
+        blueTreshold = redTreshold - 0.001;
       }
 
       redraw();
@@ -256,14 +254,12 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
 
     function on_drag_red() {
       if (xScale.invert(d3.event.x) < blueTreshold) {
-        redTreshold = minBadClientsTrashold;
+        redTreshold = blueTreshold + 0.001;
       } else if (xScale.invert(d3.event.x) > 1) {
         redTreshold = 1;
       } else {
         redTreshold = xScale.invert(d3.event.x);
       }
-
-      console.log(redTreshold);
 
       redraw_red();
     }
