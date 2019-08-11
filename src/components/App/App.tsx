@@ -8,9 +8,9 @@ const App: React.FC = () => {
     width: 800,
     margin: {
       top: 15,
-      right: 15,
+      right: 45,
       bottom: 30,
-      left: 15
+      left: 45
     }
   };
 

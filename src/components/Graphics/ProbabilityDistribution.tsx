@@ -145,13 +145,14 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("stop-color", d => d.color);
 
     let blueTreshold = 0.15;
-    const redTreshold = 0.45;
+    let redTreshold = 0.45;
     const maxGoodClientsTrashold = redTreshold - 0.001;
+    const minBadClientsTrashold = blueTreshold + 0.001;
     const draggingRectangleHeight = 30;
     const draggingRectangleWidth = 5;
     const tresholdLineWidth = 1;
 
-    // Treshold rectangle
+    // BLUE Treshold rectangle
     area
       .append("g")
       .attr("id", "treshold-rect")
@@ -162,7 +163,19 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("width", xScale(blueTreshold))
       .style("opacity", "0.1");
 
-    // Treshold line
+    // RED Treshold rectangle
+    area
+      .append("g")
+      .attr("id", "treshold-rect-red")
+      .append("rect")
+      .attr("id", "red-treshold-rect")
+      .attr("height", dimensions.height)
+      .attr("fill", "red")
+      .attr("width", dimensions.width - xScale(redTreshold) + 1)
+      .style("opacity", "0.1")
+      .attr("transform", `translate(${xScale(redTreshold)}, 0)`);
+
+    // BLUE Treshold line
     d3.select("#treshold-rect")
       .append("line")
       .attr("id", "treshold-line")
@@ -174,53 +187,88 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("stroke-width", 1)
       .style("opacity", 0.5);
 
+    // RED Treshold line
+    d3.select("#treshold-rect-red")
+      .append("line")
+      .attr("id", "treshold-line-red")
+      .attr("x1", xScale(redTreshold) + tresholdLineWidth / 2)
+      .attr("y1", "0%")
+      .attr("x2", xScale(redTreshold) + tresholdLineWidth / 2)
+      .attr("y2", dimensions.height)
+      .attr("stroke", "red")
+      .attr("stroke-width", 1)
+      .style("opacity", 0.5);
+
     function redraw() {
+      console.log(blueTreshold);
+
       // Remove possability to drag rectan`gle to negative X coordinates
       d3.select("#dragging-rectangle")
-        .attr("x", blueTreshold >= 0 ? blueTreshold : 0)
+        .attr("x", xScale(blueTreshold))
         .attr("transform", `translate(-2, 0)`);
 
       d3.select("#dragging-text")
-        .text(
-          +xScale.invert(blueTreshold).toFixed(3) > 0
-            ? +xScale.invert(blueTreshold).toFixed(3)
-            : "0.00"
-        )
-        .attr("x", () => {
-          if (xScale.invert(blueTreshold).toFixed(3).length > 3) {
-            return blueTreshold >= 0 ? blueTreshold - 41 : -41;
-          } else {
-            return blueTreshold >= 0 ? blueTreshold - 41 : -41;
-          }
-        });
+        .text(blueTreshold.toFixed(3))
+        .attr("x", xScale(blueTreshold) - 41);
 
       d3.select("#treshold-line")
-        .attr(
-          "x1",
-          blueTreshold >= 0 ? blueTreshold + draggingRectangleWidth / 2 : 2.5
-        )
-        .attr(
-          "x2",
-          blueTreshold >= 0 ? blueTreshold + draggingRectangleWidth / 2 : 2.5
-        )
+        .attr("x1", xScale(blueTreshold) + draggingRectangleWidth / 2)
+        .attr("x2", xScale(blueTreshold) + draggingRectangleWidth / 2)
         .attr("transform", `translate(-2, 0)`);
 
       d3.select("#blue-treshold-rect").attr(
         "width",
-        blueTreshold >= 0 ? blueTreshold + tresholdLineWidth : 0
+        xScale(blueTreshold) + tresholdLineWidth
       );
     }
 
+    function redraw_red() {
+      // Remove possability to drag rectan`gle to negative X coordinates
+      d3.select("#dragging-rectangle-red")
+        .attr("x", xScale(redTreshold))
+        .attr("transform", `translate(-2, 0)`);
+
+      d3.select("#dragging-text-red")
+        .text(redTreshold.toFixed(3))
+        .attr("x", xScale(redTreshold) + 20);
+
+      d3.select("#treshold-line-red")
+        .attr("x1", xScale(redTreshold) + draggingRectangleWidth / 2)
+        .attr("x2", xScale(redTreshold) + draggingRectangleWidth / 2)
+        .attr("transform", `translate(-2, 0)`);
+
+      d3.select("#red-treshold-rect")
+        .attr("width", dimensions.width - xScale(redTreshold) + 1)
+        .attr("transform", `translate(${xScale(redTreshold)}, 0)`);
+    }
+
     function on_drag() {
-      blueTreshold =
-        xScale.invert(d3.event.x) < redTreshold
-          ? d3.event.x
-          : xScale(maxGoodClientsTrashold);
+      if (xScale.invert(d3.event.x) < 0) {
+        blueTreshold = 0;
+      } else if (xScale.invert(d3.event.x) < redTreshold) {
+        blueTreshold = xScale.invert(d3.event.x);
+      } else if (xScale.invert(d3.event.x) > redTreshold) {
+        blueTreshold = maxGoodClientsTrashold;
+      }
 
       redraw();
     }
 
-    // Dragging rectangle
+    function on_drag_red() {
+      if (xScale.invert(d3.event.x) < blueTreshold) {
+        redTreshold = minBadClientsTrashold;
+      } else if (xScale.invert(d3.event.x) > 1) {
+        redTreshold = 1;
+      } else {
+        redTreshold = xScale.invert(d3.event.x);
+      }
+
+      console.log(redTreshold);
+
+      redraw_red();
+    }
+
+    // BLUE Dragging rectangle
     d3.select("#treshold-rect")
       .append("rect")
       .attr("id", "dragging-rectangle")
@@ -244,6 +292,31 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("y", (dimensions.height + draggingRectangleWidth) / 2)
       .style("font-size", "14px")
       .style("fill", "blue");
+
+    // RED Dragging rectangle
+    d3.select("#treshold-rect-red")
+      .append("rect")
+      .attr("id", "dragging-rectangle-red")
+      .attr("fill", "red")
+      .attr("height", draggingRectangleHeight)
+      .attr("width", draggingRectangleWidth)
+      .attr("x", xScale(redTreshold))
+      .attr("transform", `translate(-2, 0)`)
+      .attr("y", (dimensions.height - draggingRectangleHeight) / 2)
+      .attr("rx", 2)
+      .attr("ry", 2)
+      .style("cursor", "ew-resize")
+      .call(d3.drag().on("drag", on_drag_red));
+
+    // RED Dragging rectangle text
+    d3.select("#treshold-rect-red")
+      .append("text")
+      .attr("id", "dragging-text-red")
+      .text(redTreshold)
+      .attr("x", xScale(redTreshold) + 20)
+      .attr("y", (dimensions.height + draggingRectangleWidth) / 2)
+      .style("font-size", "14px")
+      .style("fill", "red");
   };
 
   React.useEffect(() => {
