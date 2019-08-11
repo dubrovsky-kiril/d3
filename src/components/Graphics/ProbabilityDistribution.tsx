@@ -145,6 +145,8 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
       .attr("stop-color", d => d.color);
 
     let blueTreshold = 0.15;
+    const redTreshold = 0.45;
+    const maxGoodClientsTrashold = redTreshold - 0.001;
     const draggingRectangleHeight = 30;
     const draggingRectangleWidth = 5;
     const tresholdLineWidth = 1;
@@ -210,7 +212,11 @@ const ProbabilityDistribution: React.FC<IProbabilityDistribution> = ({
     }
 
     function on_drag() {
-      blueTreshold = d3.event.x;
+      blueTreshold =
+        xScale.invert(d3.event.x) < redTreshold
+          ? d3.event.x
+          : xScale(maxGoodClientsTrashold);
+
       redraw();
     }
 
